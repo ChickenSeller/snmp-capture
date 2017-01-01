@@ -5,10 +5,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.w3c.dom.*;
 import redis.clients.jedis.Jedis;
 
@@ -16,6 +15,7 @@ import redis.clients.jedis.Jedis;
  * Created by kaguya on 2016/12/4.
  */
 public class DataProccessor {
+    public static Config config;
     public static void main(String args[]){
         SolveArgs(args);
     }
@@ -47,17 +47,28 @@ public class DataProccessor {
         for(int i=0;i<args.length;i++){
             if(args[i].equals("--mode")){
                 mode = args[i+1];
-            }else if (args[i].equals("--data")){
+            }else if (args[i].equals("--config")){
                 file = args[i+1];
-            }else if(args[i].equals("--filter")){
-                filter = args[i+1];
             }
-            if(mode.equals("parse-data")){
-                ParseData(file);
+
+
+            if(mode.equals("capture")){
+                //ParseData(file);
             }else if(mode.equals("analyse-data")){
                 AnalyseData(filter);
             }
         }
+        DataProccessor.config = new Config(file);
+        Date date = new Date();
+        SimpleDateFormat ft =
+                new SimpleDateFormat ("yyyyMMddhhmm");
+        String date_str = ft.format(date);
+        for (DeviceConfig cfg:DataProccessor.config.devices
+                ) {
+            CaptureExec x = new CaptureExec(cfg.ip,cfg,date_str);
+            x.start();
+        }
+
     }
     private static void ParseData(String file){
         try{
