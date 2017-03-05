@@ -1,18 +1,17 @@
+/**
+ * Created by kaguya on 3/5/17.
+ */
 import redis.clients.jedis.Jedis;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
-/**
- * Created by kaguya on 16-12-31.
- */
-public class CaptureExec implements Runnable {
+public class CaptureWorker implements Runnable {
     private Thread t;
     private String thread_name;
     private DeviceConfig device_cfg;
     private String time_stamp;
-    public CaptureExec(String ac_host,DeviceConfig device_cfg,String time_stamp){
+    public CaptureWorker(String ac_host,DeviceConfig device_cfg,String time_stamp){
         this.thread_name = ac_host;
         this.device_cfg = device_cfg;
         this.time_stamp = time_stamp;
@@ -20,8 +19,8 @@ public class CaptureExec implements Runnable {
     public void run(){
         Runtime run = Runtime.getRuntime();
         try{
-            Jedis jedis = new Jedis(DataProccessor.config.redis_host,DataProccessor.config.redis_port);
-            for (String oid:DataProccessor.config.oids
+            Jedis jedis = new Jedis(SnmpCapture.config.redis_host,SnmpCapture.config.redis_port);
+            for (String oid:SnmpCapture.config.oids
                     ) {
                 String command = "snmpwalk -v "+this.device_cfg.snmp_version+" -c "+this.device_cfg.password+" -C c "+this.device_cfg.ip+" "+oid;
                 System.out.println(command);
@@ -36,13 +35,13 @@ public class CaptureExec implements Runnable {
                     jedis.set(key,value);
                 }
                 p.waitFor();
-                    if(p.exitValue()==0){
-                        System.out.println("Thread "+this.thread_name+"\tTask "+oid+"\tExec Successful");
-                    }else{
-                        System.out.println("Thread "+this.thread_name+"\tTask "+oid+"\tExec FAiled");
-                    }
-                    reader.close();
-                    in.close();
+                if(p.exitValue()==0){
+                    System.out.println("Thread "+this.thread_name+"\tTask "+oid+"\tExec Successful");
+                }else{
+                    System.out.println("Thread "+this.thread_name+"\tTask "+oid+"\tExec FAiled");
+                }
+                reader.close();
+                in.close();
 
             }
         }catch (Exception e){

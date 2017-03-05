@@ -29,7 +29,7 @@ public class Config {
         ArrayList<String> oid_string = new ArrayList<>();
         DeviceConfig temp_device;
         for (String line:content
-             ) {
+                ) {
             line = line.trim();
             if(line.substring(0,1).equals("#")){
                 continue;
@@ -84,3 +84,4 @@ class DeviceConfig{
         this.snmp_version = SnmpVersion.trim();
     }
 }
+
