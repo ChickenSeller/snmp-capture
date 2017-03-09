@@ -1,5 +1,6 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EmptyStackException;
 import java.util.TimeZone;
 
 /**
@@ -11,7 +12,6 @@ public class SnmpCapture {
 
     public static void main(String args[]){
         SolveArgs(args);
-        System.out.println("test");
     }
 
     private static void SolveArgs(String args[]){
