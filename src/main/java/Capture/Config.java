@@ -1,3 +1,5 @@
+package Capture;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +13,7 @@ import java.util.List;
 public class Config {
     public Path config_file;
     public DeviceConfig[] devices;
-    public String[] oids;
+    public OidNodeConfig[] oids;
     public String redis_host;
     public int redis_port;
     public Config(String  file){
@@ -28,6 +30,7 @@ public class Config {
         ArrayList<String> device_string = new ArrayList<>();
         ArrayList<String> oid_string = new ArrayList<>();
         DeviceConfig temp_device;
+        OidNodeConfig temp_oid;
         for (String line:content
                 ) {
             line = line.trim();
@@ -47,9 +50,6 @@ public class Config {
                 default:
                     if(segment==1){
                         device_string.add(line);
-                        //String[] device_info = line.split(" ");
-                        //temp_device = new DeviceConfig(device_info[0],device_info[1],device_info[2]);
-
                     }else if(segment==2){
                         oid_string.add(line);
                     }else if(segment==3) {
@@ -63,14 +63,16 @@ public class Config {
             }
         }
         this.devices = new DeviceConfig[device_string.size()];
-        this.oids = new String[oid_string.size()];
+        this.oids = new OidNodeConfig[oid_string.size()];
         for (int i=0;i<device_string.size();i++){
             String[] device_info = device_string.get(i).split(" ");
             temp_device = new DeviceConfig(device_info[0],device_info[1],device_info[2]);
             this.devices[i] = temp_device;
         }
         for(int i=0;i<oid_string.size();i++){
-            this.oids[i] = oid_string.get(i);
+            String[] oid_info = oid_string.get(i).split(" ");
+            temp_oid = new OidNodeConfig(oid_info[0],oid_info[1],oid_info[2]);
+            this.oids[i] = temp_oid;
         }
     }
 }
@@ -84,4 +86,5 @@ class DeviceConfig{
         this.snmp_version = SnmpVersion.trim();
     }
 }
+
 

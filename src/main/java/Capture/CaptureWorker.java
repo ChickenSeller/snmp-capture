@@ -1,4 +1,4 @@
-/**
+package Capture; /**
  * Created by kaguya on 3/5/17.
  */
 import redis.clients.jedis.Jedis;
@@ -11,7 +11,7 @@ public class CaptureWorker implements Runnable {
     private String thread_name;
     private DeviceConfig device_cfg;
     private String time_stamp;
-    public CaptureWorker(String ac_host,DeviceConfig device_cfg,String time_stamp){
+    public CaptureWorker(String ac_host, DeviceConfig device_cfg, String time_stamp){
         this.thread_name = ac_host;
         this.device_cfg = device_cfg;
         this.time_stamp = time_stamp;
@@ -19,9 +19,10 @@ public class CaptureWorker implements Runnable {
     public void run(){
         Runtime run = Runtime.getRuntime();
         try{
-            Jedis jedis = new Jedis(SnmpCapture.config.redis_host,SnmpCapture.config.redis_port);
-            for (String oid:SnmpCapture.config.oids
+            Jedis jedis = new Jedis(SnmpCapture.config.redis_host, SnmpCapture.config.redis_port);
+            for (OidNodeConfig oid_info: SnmpCapture.config.oids
                     ) {
+                String oid = oid_info.oid;
                 String command = "snmpwalk -v "+this.device_cfg.snmp_version+" -c "+this.device_cfg.password+" -C c "+this.device_cfg.ip+" "+oid;
                 System.out.println(command);
                 Process p = run.exec(command);

@@ -1,6 +1,7 @@
+package Capture;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EmptyStackException;
 import java.util.TimeZone;
 
 /**
@@ -9,11 +10,6 @@ import java.util.TimeZone;
 
 public class SnmpCapture {
     public static Config config;
-
-    public static void main(String args[]){
-        SolveArgs(args);
-    }
-
     private static void SolveArgs(String args[]){
         String file="./data.conf";
         String mode="";
@@ -42,11 +38,15 @@ public class SnmpCapture {
         ft.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         String date_str = ft.format(date);
         System.out.println(date_str);
-        for (DeviceConfig cfg:SnmpCapture.config.devices
+        for (DeviceConfig cfg: SnmpCapture.config.devices
                 ) {
             CaptureWorker x = new CaptureWorker(cfg.ip,cfg,date_str);
             x.start();
         }
 
+    }
+
+    public static void main(String args[]){
+        SolveArgs(args);
     }
 }
