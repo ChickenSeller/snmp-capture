@@ -21,6 +21,14 @@ public class StaticAcInfoStore {
     }
 
     public void Store(){
+        try {
+            MysqlWorker mysql = MysqlWorker.getInstance();
+            mysql.stmt = mysql.conn.createStatement();
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 }

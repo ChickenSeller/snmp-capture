@@ -1,5 +1,8 @@
 package Capture;
 
+import Store.MysqlWorker;
+import Capture.MysqlConfig;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +19,7 @@ public class Config {
     public OidNodeConfig[] oids;
     public String redis_host;
     public int redis_port;
+    public MysqlConfig mysql;
     public Config(String  file){
         try{
             config_file= Paths.get(file);
@@ -29,8 +33,10 @@ public class Config {
         int segment = 0;
         ArrayList<String> device_string = new ArrayList<>();
         ArrayList<String> oid_string = new ArrayList<>();
+        String mysql_string = "";
         DeviceConfig temp_device;
         OidNodeConfig temp_oid;
+
         for (String line:content
                 ) {
             line = line.trim();
@@ -47,6 +53,9 @@ public class Config {
                 case "[redis]":
                     segment = 3;
                     continue;
+                case "[mysql]":
+                    segment = 4;
+                    continue;
                 default:
                     if(segment==1){
                         device_string.add(line);
@@ -56,12 +65,16 @@ public class Config {
                         String[] temp = line.split(" ");
                         this.redis_host = temp[0];
                         this.redis_port = Integer.parseInt(temp[1]);
-                    }else
-                    {
+                    }else if(segment==4) {
+                        mysql_string = line;
+                    }else {
                         continue;
                     }
             }
         }
+        String[] temp_mysql = mysql_string.split(" ");
+        MysqlConfig temp_mysql_config = new MysqlConfig(temp_mysql[0],temp_mysql[1],temp_mysql[2],temp_mysql[3]);
+        this.mysql = temp_mysql_config;
         this.devices = new DeviceConfig[device_string.size()];
         this.oids = new OidNodeConfig[oid_string.size()];
         for (int i=0;i<device_string.size();i++){
@@ -86,5 +99,6 @@ class DeviceConfig{
         this.snmp_version = SnmpVersion.trim();
     }
 }
+
 
 
