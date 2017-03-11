@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by kaguya on 3/10/17.
  */
-public class StaticAcInfoStore {
+public class StaticAcInfoStore extends StoreBase {
     public List<OidNodeConfig> oid;
     public StaticAcInfoStore(){
         oid = new ArrayList<OidNodeConfig>();
@@ -30,5 +30,9 @@ public class StaticAcInfoStore {
             e.printStackTrace();
         }
 
+    }
+
+    private boolean UpdateData(){
+        return true;
     }
 }

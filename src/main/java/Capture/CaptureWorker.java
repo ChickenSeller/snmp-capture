@@ -6,16 +6,21 @@ import redis.clients.jedis.Jedis;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.Set;
+
 public class CaptureWorker implements Runnable {
     private Thread t;
     private String thread_name;
     private DeviceConfig device_cfg;
     private String time_stamp;
+
     public CaptureWorker(String ac_host, DeviceConfig device_cfg, String time_stamp){
         this.thread_name = ac_host;
         this.device_cfg = device_cfg;
         this.time_stamp = time_stamp;
     }
+
     public void run(){
         Runtime run = Runtime.getRuntime();
         try{
@@ -31,7 +36,9 @@ public class CaptureWorker implements Runnable {
                 String line = "";
                 while((line=reader.readLine())!=null){
                     String[] line_arr = line.split("=");
-                    String key = this.time_stamp+"::"+this.device_cfg.ip+"::"+line_arr[0].trim();
+                    String tempRawString = line_arr[0].trim();
+                    tempRawString = tempRawString.replaceAll("SNMPv2-SMI::enterprises",".1.3.6.1.4.1");
+                    String key = this.time_stamp+"::"+this.device_cfg.ip+"::"+tempRawString;
                     String value = line_arr[1].trim();
                     jedis.set(key,value);
                 }
@@ -43,12 +50,14 @@ public class CaptureWorker implements Runnable {
                 }
                 reader.close();
                 in.close();
+                ModifyKey(jedis,this.device_cfg.ip);
 
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+
     public void start(){
         System.out.println("Starting\t"+this.thread_name);
         if(t==null){
@@ -56,4 +65,19 @@ public class CaptureWorker implements Runnable {
             t.start();
         }
     }
+    private void ModifyKey(Jedis jedis,String ip){
+        for (Map.Entry<String,String> entry:OidConfig.INSTANCE.Config.entrySet()
+             ) {
+            Set<String> keys = jedis.keys("*"+ip+"::"+entry.getKey()+"*");
+            for (String key:keys
+                 ) {
+                String value = jedis.get(key);
+                jedis.del(key);
+                key = key.replaceAll(entry.getKey(),entry.getValue());
+                System.out.println(key);
+                jedis.set(key,value);
+            }
+        }
+    }
+
 }
