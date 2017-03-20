@@ -14,9 +14,9 @@ public class AcStorage extends Data {
         Storage = new ArrayList<AcStorageNode>();
     }
 
-    public boolean AddNode(int Index,String Type,String Size,String Used,String Name){
+    public boolean AddNode(int Index,String Type){
         if(CheckId(Index)){
-            this.Storage.add(new AcStorageNode(Index,Type,Size,Used,Name));
+            this.Storage.add(new AcStorageNode(Index,Type));
             this.NodeId.add(Index);
             return true;
         }else {
@@ -25,18 +25,3 @@ public class AcStorage extends Data {
     }
 }
 
-class AcStorageNode{
-    public int Index;
-    public String Type;
-    public String Size;
-    public String Used;
-    public String Name;
-
-    public AcStorageNode(int Index,String Type,String Size,String Used,String Name){
-        this.Index = Index;
-        this.Size = Size;
-        this.Type = Type;
-        this.Used = Used;
-        this.Name = Name;
-    }
-}

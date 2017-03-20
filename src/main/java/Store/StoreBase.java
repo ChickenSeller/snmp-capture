@@ -18,8 +18,18 @@ public class StoreBase {
                 return ParseIpAddress(ValueArray[1]);
             case "Hex-STRING":
                 return ParseHex_STRING(ValueArray[1]);
+            case "INTEGER":
+                return ParseINTEGER(ValueArray[1]);
+            case "Gauge32":
+                return ParseGauge32(ValueArray[1]);
         }
         return Value;
+    }
+
+    protected String GetVariables(String str){
+        String[] str_arr = str.split("::");
+        String[] temp_arr = str_arr[2].split("\\.");
+        return str_arr[2].replace(temp_arr[0],"").replace(".","");
     }
 
 
@@ -36,6 +46,14 @@ public class StoreBase {
     private String ParseHex_STRING(String string){
         String tempStr = string.replaceAll(" ","-");
         return tempStr.trim();
+    }
+
+    private String ParseINTEGER(String string){
+        return string.trim();
+    }
+
+    private String ParseGauge32(String string){
+        return string.trim();
     }
 
 
