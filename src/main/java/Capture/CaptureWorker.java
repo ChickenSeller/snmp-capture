@@ -1,6 +1,7 @@
 package Capture; /**
  * Created by kaguya on 3/5/17.
  */
+import Store.Store;
 import redis.clients.jedis.Jedis;
 
 import java.io.BufferedInputStream;
@@ -22,6 +23,7 @@ public class CaptureWorker implements Runnable {
     }
 
     public void run(){
+        SnmpCapture.ThreadCount+=1;
         Runtime run = Runtime.getRuntime();
         try{
             Jedis jedis = new Jedis(SnmpCapture.config.redis_host, SnmpCapture.config.redis_port);
@@ -53,7 +55,13 @@ public class CaptureWorker implements Runnable {
                 ModifyKey(jedis,this.device_cfg.ip);
 
             }
+            SnmpCapture.ThreadCount-=1;
+            if(SnmpCapture.ThreadCount<=0){
+                Store store = new Store();
+                store.ExecStore();
+            }
         }catch (Exception e){
+            SnmpCapture.ThreadCount -=1;
             e.printStackTrace();
         }
     }

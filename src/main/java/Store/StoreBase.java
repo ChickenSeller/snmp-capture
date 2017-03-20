@@ -1,11 +1,11 @@
 package Store;
 
-import com.sun.xml.internal.fastinfoset.util.ValueArray;
-
 /**
  * Created by kaguya on 3/11/17.
  */
 public class StoreBase {
+    static protected String TableName = "";
+    static protected String Time;
 
     protected String FormatData(String Value){
         String[] ValueArray = Value.split(":");
@@ -21,6 +21,8 @@ public class StoreBase {
         }
         return Value;
     }
+
+
 
     private String ParseSTRING(String string){
         String tempStr = string.replaceAll("\"","");

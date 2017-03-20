@@ -10,6 +10,9 @@ import java.util.TimeZone;
 
 public class SnmpCapture {
     public static Config config;
+    static public String DateStr;
+    public static int ThreadCount;
+
     private static void SolveArgs(String args[]){
         String file="./data.conf";
         String mode="";
@@ -33,20 +36,19 @@ public class SnmpCapture {
         SnmpCapture.config = new Config(file);
         Date date = new Date();
 
-        SimpleDateFormat ft =
-                new SimpleDateFormat ("yyyyMMddhhmm");
-        ft.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-        String date_str = ft.format(date);
-        System.out.println(date_str);
+
+        SnmpCapture.DateStr = Long.toString(date.getTime()/1000);
+        System.out.println(SnmpCapture.DateStr);
         for (DeviceConfig cfg: SnmpCapture.config.devices
                 ) {
-            CaptureWorker x = new CaptureWorker(cfg.ip,cfg,date_str);
+            CaptureWorker x = new CaptureWorker(cfg.ip,cfg,SnmpCapture.DateStr);
             x.start();
         }
 
     }
 
     public static void main(String args[]){
+        SnmpCapture.ThreadCount = 0;
         SolveArgs(args);
     }
 }
