@@ -1,22 +1,24 @@
 package Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kaguya on 3/10/17.
  */
 public class AcFan extends Data {
-    List<AcFanNode> Fan;
+    public Map<Integer,AcFanNode> Fan;
 
     public AcFan(){
         NodeId = new ArrayList<Integer>();
-        Fan = new ArrayList<AcFanNode>();
+        Fan = new HashMap<Integer,AcFanNode>();
     }
 
     public boolean AddNode(int Index,String Status){
         if(CheckId(Index)){
-            this.Fan.add(new AcFanNode(Index,Status));
+            this.Fan.put(Index,new AcFanNode(Index,Status));
             this.NodeId.add(Index);
             return true;
         }else {
@@ -25,12 +27,3 @@ public class AcFan extends Data {
     }
 }
 
-class AcFanNode{
-    public int Index;
-    public String Status;
-
-    public AcFanNode(int Index,String Status){
-        this.Index = Index;
-        this.Status =Status;
-    }
-}

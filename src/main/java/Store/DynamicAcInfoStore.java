@@ -3,6 +3,7 @@ package Store;
 import Capture.OidNodeConfig;
 import Capture.SnmpCapture;
 import Data.*;
+import org.omg.PortableInterceptor.INACTIVE;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
@@ -39,6 +40,9 @@ public class DynamicAcInfoStore extends StoreBase {
         GetMemoryInfo();
         GetCpuPercent();
         GetCpuInfo();
+        GetStorageInfo();
+        GetFanInfo();
+        GetPowerInfo();
 
     }
 
@@ -182,8 +186,140 @@ public class DynamicAcInfoStore extends StoreBase {
             String[] temp_arr = temp.split("::");
             if(!data.containsKey(temp_arr[1])){
                 data.put(temp_arr[1],new AcStorage());
-                //TODO
             }
+        }
+        for (Map.Entry<String,AcStorage> entry:data.entrySet()
+             ) {
+            AcStorage temp_info = entry.getValue();
+            RedisRegex = "*"+entry.getKey()+"::sysXStorageType*";
+            res = jedis.keys(RedisRegex);
+            for (String temp:res
+                 ) {
+                int Index = Integer.parseInt(this.GetVariables(temp));
+                if(!temp_info.Storage.containsKey(Index)){
+                    temp_info.AddNode(Index,FormatData(jedis.get(temp)));
+                }else {
+                    AcStorageNode temp_node = temp_info.Storage.get(Index);
+                    temp_node.Type = FormatData(jedis.get(temp));
+                    temp_info.Storage.put(Index,temp_node);
+                }
+            }
+
+            RedisRegex = "*"+entry.getKey()+"::sysXStorageName*";
+            res = jedis.keys(RedisRegex);
+            for (String temp:res
+                    ) {
+                int Index = Integer.parseInt(this.GetVariables(temp));
+                if(temp_info.Storage.containsKey(Index)){
+                    AcStorageNode temp_node = temp_info.Storage.get(Index);
+                    temp_node.Name = FormatData(jedis.get(temp));
+                    temp_info.Storage.put(Index,temp_node);
+                }
+            }
+
+            RedisRegex = "*"+entry.getKey()+"::sysXStorageSize*";
+            res = jedis.keys(RedisRegex);
+            for (String temp:res
+                    ) {
+                int Index = Integer.parseInt(this.GetVariables(temp));
+                if(temp_info.Storage.containsKey(Index)){
+                    AcStorageNode temp_node = temp_info.Storage.get(Index);
+                    temp_node.Size = Integer.parseInt(FormatData(jedis.get(temp)));
+                    temp_info.Storage.put(Index,temp_node);
+                }
+            }
+
+            RedisRegex = "*"+entry.getKey()+"::sysXStorageUsed*";
+            res = jedis.keys(RedisRegex);
+            for (String temp:res
+                    ) {
+                int Index = Integer.parseInt(this.GetVariables(temp));
+                if(temp_info.Storage.containsKey(Index)){
+                    AcStorageNode temp_node = temp_info.Storage.get(Index);
+                    temp_node.Used = Integer.parseInt(FormatData(jedis.get(temp)));
+                    temp_info.Storage.put(Index,temp_node);
+                }
+            }
+        }
+
+        for (Map.Entry<String,AcStorage> entry:data.entrySet()
+             ) {
+            DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
+            dynamic_ac.storage_info = entry.getValue();
+            this.DataSet.put(entry.getKey(),dynamic_ac);
+        }
+    }
+
+    private void GetFanInfo(){
+        Map<String,AcFan> data = new HashMap<String,AcFan>();
+        String RedisRegex = "*sysExtFanStatus*";
+        Set<String> res = jedis.keys(RedisRegex);
+        for (String temp:res
+                ) {
+            String[] temp_arr = temp.split("::");
+            if(!data.containsKey(temp_arr[1])){
+                data.put(temp_arr[1],new AcFan());
+            }
+        }
+        for (Map.Entry<String,AcFan> entry:data.entrySet()
+             ) {
+            AcFan temp_info = entry.getValue();
+            RedisRegex = "*"+entry.getKey()+"::sysExtFanStatus*";
+            res = jedis.keys(RedisRegex);
+            for (String temp:res
+                    ) {
+                int Index = Integer.parseInt(this.GetVariables(temp));
+                if(!temp_info.Fan.containsKey(Index)){
+                    temp_info.AddNode(Index,FormatData(jedis.get(temp)));
+                }else {
+                    AcFanNode temp_node = temp_info.Fan.get(Index);
+                    temp_node.Status = FormatData(jedis.get(temp));
+                    temp_info.Fan.put(Index,temp_node);
+                }
+            }
+        }
+        for (Map.Entry<String,AcFan> entry:data.entrySet()
+             ) {
+            DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
+            dynamic_ac.fan_info = entry.getValue();
+            this.DataSet.put(entry.getKey(),dynamic_ac);
+        }
+
+    }
+
+    private void GetPowerInfo(){
+        Map<String,PowerSupply> data = new HashMap<String,PowerSupply>();
+        String RedisRegex = "*sysExtPowerSupplyStatus*";
+        Set<String> res = jedis.keys(RedisRegex);
+        for (String temp:res
+                ) {
+            String[] temp_arr = temp.split("::");
+            if(!data.containsKey(temp_arr[1])){
+                data.put(temp_arr[1],new PowerSupply());
+            }
+        }
+        for (Map.Entry<String,PowerSupply> entry:data.entrySet()
+                ) {
+            PowerSupply temp_info = entry.getValue();
+            RedisRegex = "*"+entry.getKey()+"::sysExtPowerSupplyStatus*";
+            res = jedis.keys(RedisRegex);
+            for (String temp:res
+                    ) {
+                int Index = Integer.parseInt(this.GetVariables(temp));
+                if(!temp_info.Power.containsKey(Index)){
+                    temp_info.AddNode(Index,FormatData(jedis.get(temp)));
+                }else {
+                    PowerSupplyNode temp_node = temp_info.Power.get(Index);
+                    temp_node.Status = FormatData(jedis.get(temp));
+                    temp_info.Power.put(Index,temp_node);
+                }
+            }
+        }
+        for (Map.Entry<String,PowerSupply> entry:data.entrySet()
+                ) {
+            DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
+            dynamic_ac.power_supply_info = entry.getValue();
+            this.DataSet.put(entry.getKey(),dynamic_ac);
         }
     }
 
@@ -195,9 +331,13 @@ class DynamicAc{
     public int memory_free;
     public String ip;
     public AcCpu proccessor_info;
+    public String proccessor_info_json;
     public AcFan fan_info;
+    public String fan_info_json;
     public AcStorage storage_info;
+    public String storage_info_json;
     public PowerSupply power_supply_info;
+    public String power_supply_info_json;
     public int cpu_used_percent;
     public int memory_used_percent;
     public int packet_loss_percent;
