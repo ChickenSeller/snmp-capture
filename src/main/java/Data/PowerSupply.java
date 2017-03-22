@@ -10,7 +10,6 @@ import java.util.Map;
  */
 public class PowerSupply extends Data {
     public Map<Integer,PowerSupplyNode> Power;
-
     public PowerSupply(){
         Power = new HashMap<Integer,PowerSupplyNode>();
         NodeId = new ArrayList<Integer>();

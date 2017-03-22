@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by kaguya on 3/10/17.
  */
-public abstract class Data {
+public class Data {
     protected List<Integer> NodeId;
 
     protected boolean CheckId(int id){

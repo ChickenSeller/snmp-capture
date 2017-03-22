@@ -32,6 +32,18 @@ public class DynamicAcInfoStore extends StoreBase {
 
     public void Store(){
         UpdateData();
+
+        try {
+            for (Map.Entry<String,DynamicAc> entry:DataSet.entrySet()
+                 ) {
+                DynamicAc data = entry.getValue();
+                String sql = String.format("INSERT INTO `%s` (`id`, `ip`, `proccessor_info`, `fan_info`, `storage_info`, `memory_size`, `memory_used`, `memory_free`, `power_supply_info`, `cpu_used_percent`, `memory_used_percent`, `packet_loss_percent`, `create_time`, `update_time`) VALUES (NULL, '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d', '%d', '%d', FROM_UNIXTIME('%s'), FROM_UNIXTIME('%s'))",
+                        DynamicAcInfoStore.TableName,data.ip,data.proccessor_info_json,data.fan_info_json,data.storage_info_json,data.memory_size,data.memory_used,data.memory_free,data.power_supply_info_json,data.cpu_used_percent,data.memory_used_percent,data.packet_loss_percent,DynamicAcInfoStore.Time,DynamicAcInfoStore.Time);
+                MysqlWorker.INSTANCE.Update(sql);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         System.out.println();
     }
 
@@ -153,6 +165,7 @@ public class DynamicAcInfoStore extends StoreBase {
                     temp_node.Descr = FormatData(jedis.get(temp));
                     temp_info.CPU.put(Index,temp_node);
                 }
+                jedis.del(temp);
             }
 
             RedisRegex = "*"+entry.getKey()+"::sysXProcessorLoad*";
@@ -164,6 +177,7 @@ public class DynamicAcInfoStore extends StoreBase {
                     AcCpuNode temp_node = temp_info.CPU.get(Index);
                     temp_node.Load = Integer.parseInt(FormatData(jedis.get(temp)));
                     temp_info.CPU.put(Index,temp_node);
+                    jedis.del(temp);
                 }
             }
 
@@ -173,6 +187,7 @@ public class DynamicAcInfoStore extends StoreBase {
              ) {
             DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
             dynamic_ac.proccessor_info = entry.getValue();
+            dynamic_ac.proccessor_info_json = JsonHelper.GetJson(dynamic_ac.proccessor_info);
             this.DataSet.put(entry.getKey(),dynamic_ac);
         }
     }
@@ -203,6 +218,7 @@ public class DynamicAcInfoStore extends StoreBase {
                     temp_node.Type = FormatData(jedis.get(temp));
                     temp_info.Storage.put(Index,temp_node);
                 }
+                jedis.del(temp);
             }
 
             RedisRegex = "*"+entry.getKey()+"::sysXStorageName*";
@@ -214,6 +230,7 @@ public class DynamicAcInfoStore extends StoreBase {
                     AcStorageNode temp_node = temp_info.Storage.get(Index);
                     temp_node.Name = FormatData(jedis.get(temp));
                     temp_info.Storage.put(Index,temp_node);
+                    jedis.del(temp);
                 }
             }
 
@@ -226,6 +243,7 @@ public class DynamicAcInfoStore extends StoreBase {
                     AcStorageNode temp_node = temp_info.Storage.get(Index);
                     temp_node.Size = Integer.parseInt(FormatData(jedis.get(temp)));
                     temp_info.Storage.put(Index,temp_node);
+                    jedis.del(temp);
                 }
             }
 
@@ -238,6 +256,7 @@ public class DynamicAcInfoStore extends StoreBase {
                     AcStorageNode temp_node = temp_info.Storage.get(Index);
                     temp_node.Used = Integer.parseInt(FormatData(jedis.get(temp)));
                     temp_info.Storage.put(Index,temp_node);
+                    jedis.del(temp);
                 }
             }
         }
@@ -246,6 +265,7 @@ public class DynamicAcInfoStore extends StoreBase {
              ) {
             DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
             dynamic_ac.storage_info = entry.getValue();
+            dynamic_ac.storage_info_json = JsonHelper.GetJson(dynamic_ac.storage_info);
             this.DataSet.put(entry.getKey(),dynamic_ac);
         }
     }
@@ -276,12 +296,14 @@ public class DynamicAcInfoStore extends StoreBase {
                     temp_node.Status = FormatData(jedis.get(temp));
                     temp_info.Fan.put(Index,temp_node);
                 }
+                jedis.del(temp);
             }
         }
         for (Map.Entry<String,AcFan> entry:data.entrySet()
              ) {
             DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
             dynamic_ac.fan_info = entry.getValue();
+            dynamic_ac.fan_info_json = JsonHelper.GetJson(dynamic_ac.fan_info);
             this.DataSet.put(entry.getKey(),dynamic_ac);
         }
 
@@ -313,12 +335,14 @@ public class DynamicAcInfoStore extends StoreBase {
                     temp_node.Status = FormatData(jedis.get(temp));
                     temp_info.Power.put(Index,temp_node);
                 }
+                jedis.del(temp);
             }
         }
         for (Map.Entry<String,PowerSupply> entry:data.entrySet()
                 ) {
             DynamicAc dynamic_ac = this.DataSet.get(entry.getKey());
             dynamic_ac.power_supply_info = entry.getValue();
+            dynamic_ac.power_supply_info_json = JsonHelper.GetJson(dynamic_ac.power_supply_info);
             this.DataSet.put(entry.getKey(),dynamic_ac);
         }
     }
