@@ -85,7 +85,12 @@ public class StaticAcInfoStore extends StoreBase {
             if(DataSet.containsKey(temp_arr[1])){
                 StaticAc temp_node = DataSet.get(temp_arr[1]);
                 if(temp_node.location==""){
-                    temp_node.location = FormatData(jedis.get(temp_arr[0]+"::"+temp_arr[1]+"::sysExtSwitchLocation."+temp_arr[1]));
+                    String str = temp_arr[0]+"::"+temp_arr[1]+"::sysExtSwitchLocation."+temp_arr[1];
+                    try{
+                        temp_node.location = FormatData(jedis.get(str));
+                    }catch (Exception e){
+
+                    }
                     DataSet.put(temp_arr[1],temp_node);
                 }
                 jedis.del(temp);
