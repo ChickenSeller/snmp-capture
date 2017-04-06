@@ -84,8 +84,13 @@ public class Config {
         }
         for(int i=0;i<oid_string.size();i++){
             String[] oid_info = oid_string.get(i).split(" ");
-            temp_oid = new OidNodeConfig(oid_info[0],oid_info[1],oid_info[2]);
-            this.oids[i] = temp_oid;
+            if(oid_info.length==2){
+                temp_oid = new OidNodeConfig(oid_info[0],oid_info[1],"");
+                this.oids[i] = temp_oid;
+            }else{
+                temp_oid = new OidNodeConfig(oid_info[0],oid_info[1],oid_info[2]);
+                this.oids[i] = temp_oid;
+            }
         }
     }
 }
